@@ -1,0 +1,72 @@
+# ESP-IDF Build Artifacts
+build/
+*.elf
+*.bin
+*.map
+*.hex
+*.obj
+*.o
+*.a
+bootloader/
+partition_table/
+flasher_args.json
+
+# SDK Configuration - Generally not tracked directly
+sdkconfig
+sdkconfig.defaults
+sdkconfig.old
+
+# Project-specific temporary or generated files (adjust as needed)
+# Example: If you have a 'data' folder that gets generated at runtime:
+# data/
+
+# IDE and Editor Specific Files
+
+# VS Code
+.vscode/
+!.vscode/settings.json  # Keep workspace settings (if you want to share)
+!.vscode/tasks.json    # Keep tasks if you have them configured
+!.vscode/launch.json   # Keep launch configurations (if you share debugging setup)
+!.vscode/extensions.json # Keep extensions recommendations
+.history/
+
+# Eclipse / CDT
+.cproject
+.project
+.settings/
+
+# Other common IDEs/Editors
+*.idea/
+*.DS_Store # macOS folder attributes
+*.log
+*.bak
+*.tmp
+*.swp
+._*
+*.swo
+*.orig
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Component-specific ignores (if needed, adjust for your components)
+# Example for SHT31 component - if you have specific build outputs there:
+# components/SHT31/*.obj
+# components/SHT31/*.o
+
+# For documentation (if you generate documentation)
+# _build/  # If you use Sphinx or similar for documentation in ESP-IDF
+
+# Files in "resources" if they are generated or large data (adjust if needed)
+# resources/*  # If you want to ignore everything in "resources" initially
+# !resources/*.txt # Example: But keep .txt files in "resources"
+
+# Compiled code artifacts
+*.d
+
+
+# my files 
+
+resources/
+.devcontainer/

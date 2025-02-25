@@ -24,11 +24,29 @@ files that provide set of directives and instructions describing the project's s
 Below is short explanation of remaining files in the project folder.
 
 ```
-├── CMakeLists.txt
-├── main
-│   ├── CMakeLists.txt
-│   └── main.c
-└── README.md                  This is the file you are currently reading
+
++++++++++++++++++++
+project directory:
+
+NATURESCAN-SHT31/
+            |──README.md                **This is the file you are currently reading
+            |──CMakeLists.txt
+            |──sdkconfig
+            └── main/       
+            │    |──CMakeLists.txt
+            │    |──main.c
+            │    └── Kconfig.projbuild
+            └── components/ 
+                    |─SHT31/ 
+                       |──CMakeLists.txt
+                       |──SHT31.c
+                       └──SHT31.h
+                                         
+                                         
+             
+
+
+
 ```
 Additionally, the sample project contains Makefile and component.mk files, used for the legacy Make based build system. 
 They are not used or needed when building with CMake and idf.py.

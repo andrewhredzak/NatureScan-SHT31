@@ -31,6 +31,23 @@ void app_main(void){
     printf("                                                                      \n");
 
 
+
+    uint8_t data[2];
+    i2c_master_bus_handle_t bus_handle;
+    i2c_master_dev_handle_t dev_handle;
+    i2c_master_init(&bus_handle, &dev_handle);
+    ESP_LOGI(TAG, "I2C initialized successfully");
+
+
+    /* Demonstrate writing by resetting the MPU9250 */
+    ESP_ERROR_CHECK(SHT_WRITE(dev_handle, SHT31_I2C_WRITE_ADDR, SHT31_CMD_PERIODIC_HALF_M));
+
+    ESP_ERROR_CHECK(i2c_master_bus_rm_device(dev_handle));
+    ESP_ERROR_CHECK(i2c_del_master_bus(bus_handle));
+    ESP_LOGI(TAG, "I2C de-initialized successfully");
+
+
+
     // calling function:
     if (xTaskCreate(my_task, "SHT31_TASK", 2048, NULL, 5, NULL) != pdPASS) {
         ESP_LOGE("MAIN", "failed to create sht31 task");

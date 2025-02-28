@@ -27,7 +27,7 @@ extern "C" {
 
 #define SHT31_I2C_ADDR_0X44 0x44 // device address given from senserion 
 #define SHT31_I2C_ADDR_0X45 0x45 
-#define SHT31_I2C_WRITE_ADDR 0x88        /*!< Register addresses of the "who am I" register */
+#define SHT31_I2C_WRITE_ADDR 0x00        /*!< Register addresses of the "who am I" register */
 
 
 
@@ -41,20 +41,21 @@ extern "C" {
 
 #define SHT31_CMD_PERIODIC_HALF_H 0x2032 
 #define SHT31_CMD_PERIODIC_HALF_M 0x2024
-#define SHT31_CMD_PERIODIC_HALF_L 0x202F
+#define SHT31_CMD_PERIODIC_HALF   0x20
+#define SHT31_CMD_PERIODIC_MSB_TWO  0x22  // 2 mps
+#define SHT31_CMD_PERIODIC_LSB_HIGH 0x36  // high repeatability 
+
+#define SHT31_CMD_FETCHDATA_MSB 0xE0
+#define SHT31_CMD_FETCHDATA_LSB 0x00
+
 
 
 void my_task(void *pvParameters);
 
-
-
 // Function prototypes
-
-
 void i2c_master_init(i2c_master_bus_handle_t *bus_handle, i2c_master_dev_handle_t *dev_handle);
-
-
-esp_err_t SHT_WRITE(i2c_master_dev_handle_t dev_handle, uint8_t reg_addr, uint8_t data);
+esp_err_t SHT_START(i2c_master_dev_handle_t dev_handle, uint8_t cmd_msb, uint8_t cmd_lsb);
+esp_err_t SHT_READ(i2c_master_dev_handle_t dev_handle,float *temperature, float *humidity);
 
 
 

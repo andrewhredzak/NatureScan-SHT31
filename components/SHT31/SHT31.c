@@ -7,7 +7,8 @@
 #include "freertos/task.h"
 
 
-//static const char TAG[] = "SHT31.C";
+static const char TAG[] = "SHT31.C";
+
 
 
 
@@ -33,16 +34,57 @@ void i2c_master_init(i2c_master_bus_handle_t *bus_handle, i2c_master_dev_handle_
 
 
 /**
- * @brief Write a byte??? to a SHT31 sensor register
+ * @brief starts periodic read to SHT31 sensor 
  */
-esp_err_t SHT_WRITE(i2c_master_dev_handle_t dev_handle, uint8_t reg_addr, uint8_t data)
+esp_err_t SHT_START(i2c_master_dev_handle_t dev_handle, uint8_t cmd_msb, uint8_t cmd_lsb)
 {
-    uint8_t write_buf[2] = {reg_addr, data};
-    return i2c_master_transmit(dev_handle, write_buf, sizeof(write_buf), I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
+    uint8_t write_cmd[2] = {cmd_msb, cmd_lsb};
+    // Print the contents of write_cmd
+    ESP_LOGI(TAG, "write_cmd[0] = 0x%02x, write_cmd[1] = 0x%02x", write_cmd[0], write_cmd[1]);
+    ESP_LOGI(TAG, "sizeof(write_cmd) = %zu", sizeof(write_cmd));
+    return i2c_master_transmit(dev_handle, write_cmd, sizeof(write_cmd), I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
+    //return i2c_master_transmit(dev_handle, data, 2, -1);
 }
 
 
+/**
+ * @brief reads a temp and humidity measurement 
+ */
 
+esp_err_t SHT_READ(i2c_master_dev_handle_t dev_handle,float *temperature, float *humidity)
+{
+    esp_err_t ret;
+    uint8_t raw_values[6] = {0};
+
+    //ESP_LOGI(TAG, "sizeof(raw_values) = %zu", sizeof(raw_values));
+    //ESP_LOGI(TAG, "tempurature = %f, humidity = %f");
+
+
+    ret = i2c_master_receive(dev_handle, raw_values, 6, -1);
+
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to read temperature and humidity");
+        return ret;
+    }
+
+
+    vTaskDelay(pdMS_TO_TICKS(20)); // Allow time for the measurement to complete
+
+    // Convert raw values to temperature and humidity
+    uint16_t raw_temp = (raw_values[0] << 8) | raw_values[1];
+    uint16_t raw_hum = (raw_values[3] << 8) | raw_values[4];
+
+    *temperature = 175.0f * (float)raw_temp / 65535.0f - 45.0f;
+    *humidity = 100.0f * (float)raw_hum / 65535.0f;
+
+    // Print the temperature and humidity values
+    ESP_LOGI(TAG, "Temperature: %.2f °C, Humidity: %.2f %%", *temperature, *humidity);
+    
+    return ESP_OK;
+
+
+
+}
 
 
 void my_task(void *pvParameters) {

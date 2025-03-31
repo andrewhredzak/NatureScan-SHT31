@@ -8,7 +8,15 @@
 static const char *TAG = "MAIN APP";
 
 
+/*
+// Add this struct definition after includes
+typedef struct {
+    i2c_master_dev_handle_t dev_handle;
+    float* temperature;
+    float* humidity;
+} sht31_task_params_t;
 
+*/
 
 
 void app_main(void){
@@ -39,8 +47,12 @@ void app_main(void){
     float temperature, humidity;
     ESP_LOGI(TAG, "I2C initialized successfully");
 
-
-
+ 
+    // calling function:
+    sht31_task_params_t* params = malloc(sizeof(sht31_task_params_t));
+    params->dev_handle = dev_handle;
+    params->temperature = &temperature;
+    params->humidity = &humidity;
 
    // Probe the sensor to check if it is connected to the bus with a 10ms timeout
     esp_err_t err = i2c_master_probe(bus_handle, SHT31_I2C_ADDR_0X44, 200);
@@ -48,30 +60,33 @@ void app_main(void){
     if(err == ESP_OK) {
         ESP_LOGI(TAG, "SHT31 sensor found");
         //xTaskCreate(sht4x_read_task, "sht4x_read_task", 4096, NULL, 5, NULL);
+        if (xTaskCreate(SHT31TAKEDATA_task, "SHT31_TASK", 2048, (void*)params, 5, NULL) != pdPASS) {
+            ESP_LOGE("MAIN", "failed to create sht31 task");
+            free(params);
+    }
+
     } else {
         ESP_LOGE(TAG, "SHT31 sensor not found");
         //sht4x_device_delete(sht4x_handle);
+        ESP_ERROR_CHECK(i2c_master_bus_rm_device(dev_handle));
+        ESP_ERROR_CHECK(i2c_del_master_bus(bus_handle));
+        ESP_LOGI(TAG, "I2C de-initialized successfully");
     }
 
 
-
-    /* Demonstrate writing by resetting the MPU9250 */
+    /*
+    // sht31 cmd send and read  
     ESP_ERROR_CHECK(SHT_START(dev_handle, SHT31_CMD_PERIODIC_MSB_TWO, SHT31_CMD_PERIODIC_LSB_HIGH));
     vTaskDelay(1000 / portTICK_PERIOD_MS);
-
     ESP_ERROR_CHECK(SHT_READ(dev_handle, &temperature, &humidity ));
 
-    ESP_ERROR_CHECK(i2c_master_bus_rm_device(dev_handle));
-    ESP_ERROR_CHECK(i2c_del_master_bus(bus_handle));
-    ESP_LOGI(TAG, "I2C de-initialized successfully");
+    */
 
+    
+    
+    
+    
 
-
-    // calling function:
-    if (xTaskCreate(my_task, "SHT31_TASK", 2048, NULL, 5, NULL) != pdPASS) {
-        ESP_LOGE("MAIN", "failed to create sht31 task");
-
-
-    }
+    
 
 }

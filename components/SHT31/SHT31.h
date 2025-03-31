@@ -50,12 +50,22 @@ extern "C" {
 
 
 
-void my_task(void *pvParameters);
+typedef struct {
+    i2c_master_dev_handle_t *dev_handle;
+    float *temperature;
+    float *humidity;
+} sht31_task_params_t;
+
+
+
+
 
 // Function prototypes
 void i2c_master_init(i2c_master_bus_handle_t *bus_handle, i2c_master_dev_handle_t *dev_handle);
 esp_err_t SHT_START(i2c_master_dev_handle_t dev_handle, uint8_t cmd_msb, uint8_t cmd_lsb);
 esp_err_t SHT_READ(i2c_master_dev_handle_t dev_handle,float *temperature, float *humidity);
+void SHT31TAKEDATA_task(void *pvParameters);
+
 
 
 

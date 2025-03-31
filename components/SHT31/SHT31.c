@@ -5,6 +5,7 @@
 #include "driver/i2c_master.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_err.h"
 
 
 static const char TAG[] = "SHT31.C";
@@ -87,11 +88,26 @@ esp_err_t SHT_READ(i2c_master_dev_handle_t dev_handle,float *temperature, float 
 }
 
 
-void my_task(void *pvParameters) {
+
+
+void SHT31TAKEDATA_task(void *pvParameters) {
+    sht31_task_params_t* params = (sht31_task_params_t*)pvParameters;
+    
+    // Now you can use:
+    //params->dev_handle;
+    //params->temperature;
+    //params->humidity;
     while (1) {
-        ESP_LOGI("SHT31_TASK", "the task is running!"); //this just logs stuff. calle by esp_log
+        ESP_LOGI("SHT31TAKEDATA_task", "the task is running!"); //this just logs stuff. calle by esp_log
+        // sht31 cmd send and read  
+        ESP_ERROR_CHECK(SHT_START(params->dev_handle, SHT31_CMD_PERIODIC_MSB_TWO, SHT31_CMD_PERIODIC_LSB_HIGH));
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        ESP_ERROR_CHECK(SHT_READ(params->dev_handle, params->temperature, params->humidity ));
         vTaskDelay(pdMS_TO_TICKS(1000));   // vtaskDelay is from FreeRTOS
     }
+    // Don't forget to free the parameters when done
+    //free(params);
+    //vTaskDelete(NULL);
 }
 
 
